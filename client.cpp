@@ -6,24 +6,28 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
+#define PORT "8888"
+#define IP "10.0.0.67"
 
+int connect2server(char *ip, char * port,int * sockfd);
 void error(const char *msg)
 {
     perror(msg);
     exit(0);
 }
 
-int read_temp_esp8266(char *ip, char * port,char * result)
+int connect2server(char *ip, char * port,int * sockfd)
 {
-    int sockfd, portno, n;
+    int  portno, n;
     struct sockaddr_in serv_addr;
     struct hostent *server;
 
-    char buffer[256];
     portno = atoi(port);
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) 
+    *sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (*sockfd < 0) 
         error("ERROR opening socket");
+
     server = gethostbyname(ip);
     if (server == NULL) {
         fprintf(stderr,"ERROR, no such host\n");
@@ -36,19 +40,45 @@ int read_temp_esp8266(char *ip, char * port,char * result)
          server->h_length);
 
     serv_addr.sin_port = htons(portno);
-    if (connect(sockfd,(const sockaddr*)&serv_addr,sizeof(serv_addr)) < 0)
+    if (connect(*sockfd,(const sockaddr*)&serv_addr,sizeof(serv_addr)) < 0)
        error("ERROR connecting");
 
-    bzero(buffer,256);
+    printf("connect to server success\n");
+    return 0;
+}
+
+int read_temp_esp8266(char * result)
+{
+    char buffer[256];
+    int sockfd,n;
+    connect2server(IP,PORT,&sockfd);
+    bzero(buffer,strlen(buffer));
     strcpy(buffer,"DHT");
     n = write(sockfd,buffer,strlen(buffer));
     if (n < 0) 
          error("ERROR writing to socket");
     bzero(buffer,256);
-    n = read(sockfd,buffer,255);
+    n = read(sockfd,buffer,strlen(buffer));
     if (n < 0) 
          error("ERROR reading from socket");
     strcpy(result,buffer);
+    close(sockfd);
+    return 0;
+}
+int test_esp8266()
+{
+    char buffer[256];
+    int sockfd,n;
+    connect2server(IP,PORT,&sockfd);
+    bzero(buffer,strlen(buffer));
+    strcpy(buffer,"TST");
+    n = write(sockfd,buffer,strlen(buffer));
+    if (n < 0) 
+         error("ERROR writing to socket");
+    bzero(buffer,strlen(buffer));
+    n = read(sockfd,buffer,strlen(buffer));
+    if (n < 0) 
+         error("ERROR reading from socket");
     close(sockfd);
     return 0;
 }
