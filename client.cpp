@@ -55,10 +55,11 @@ int read_temp_esp8266(char * result)
     bzero(buffer,strlen(buffer));
     strcpy(buffer,"DHT");
     n = write(sockfd,buffer,strlen(buffer));
-    if (n < 0) 
-         error("ERROR writing to socket");
+    if (n < 0)
+   	    error("ERROR writing to socket");
     bzero(buffer,256);
-    n = read(sockfd,buffer,strlen(buffer));
+    n = read(sockfd,buffer,255);
+    printf("%d from esp %s\n",n,buffer);
     if (n < 0) 
          error("ERROR reading from socket");
     strcpy(result,buffer);
@@ -75,8 +76,8 @@ int test_esp8266()
     n = write(sockfd,buffer,strlen(buffer));
     if (n < 0) 
          error("ERROR writing to socket");
-    bzero(buffer,strlen(buffer));
-    n = read(sockfd,buffer,strlen(buffer));
+    bzero(buffer,256);
+    n = read(sockfd,buffer,255);
     if (n < 0) 
          error("ERROR reading from socket");
     close(sockfd);
