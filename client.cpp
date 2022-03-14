@@ -7,15 +7,18 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #define PORT "8888"
-#define IP "10.0.0.67"
+
+#define IP    "10.0.0.105"
+#define IP_MB "10.0.0.67"
 
 int connect2server(char *ip, char * port,int * sockfd);
+void error(const char *msg);
+
 void error(const char *msg)
 {
     perror(msg);
     exit(0);
 }
-
 int connect2server(char *ip, char * port,int * sockfd)
 {
     int  portno, n;
@@ -43,43 +46,30 @@ int connect2server(char *ip, char * port,int * sockfd)
     if (connect(*sockfd,(const sockaddr*)&serv_addr,sizeof(serv_addr)) < 0)
        error("ERROR connecting");
 
-    printf("connect to server success\n");
+    printf("connect to server success %s\n",ip);
     return 0;
 }
 
-int read_temp_esp8266(char * result)
+int read_esp8266(char *msg,char * result)
 {
     char buffer[256];
     int sockfd,n;
-    connect2server(IP,PORT,&sockfd);
+    if (strstr(msg,"DHT"))
+     connect2server(IP,PORT,&sockfd);
+    else if (strstr(msg,"MB"))
+     connect2server(IP_MB,PORT,&sockfd);
+
     bzero(buffer,strlen(buffer));
-    strcpy(buffer,"DHT");
+    strcpy(buffer,msg);
     n = write(sockfd,buffer,strlen(buffer));
     if (n < 0)
    	    error("ERROR writing to socket");
     bzero(buffer,256);
     n = read(sockfd,buffer,255);
-    printf("%d from esp %s\n",n,buffer);
+    //printf("%d from esp %s\n",n,buffer);
     if (n < 0) 
          error("ERROR reading from socket");
     strcpy(result,buffer);
-    close(sockfd);
-    return 0;
-}
-int test_esp8266()
-{
-    char buffer[256];
-    int sockfd,n;
-    connect2server(IP,PORT,&sockfd);
-    bzero(buffer,strlen(buffer));
-    strcpy(buffer,"TST");
-    n = write(sockfd,buffer,strlen(buffer));
-    if (n < 0) 
-         error("ERROR writing to socket");
-    bzero(buffer,256);
-    n = read(sockfd,buffer,255);
-    if (n < 0) 
-         error("ERROR reading from socket");
     close(sockfd);
     return 0;
 }
