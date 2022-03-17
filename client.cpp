@@ -7,11 +7,18 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #define PORT "8888"
+#define _HOME
+//#define _CELL
+#ifdef _HOME
+#define IP    "10.0.0.67"
+#define IP_MB "10.0.0.105"
+#endif
+#ifdef _CELL
+#define IP    "192.168.1.4"
+#define IP_MB "192.168.1.3"
+#endif
 
-#define IP    "10.0.0.105"
-#define IP_MB "10.0.0.67"
-
-int connect2server(char *ip, char * port,int * sockfd);
+int connect2server(char *ip, char * port,int * sockfd); // connect to rapberry
 void error(const char *msg);
 
 void error(const char *msg)
