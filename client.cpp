@@ -6,16 +6,21 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
 #define PORT "8888"
 #define _HOME
 //#define _CELL
 #ifdef _HOME
-#define IP    "10.0.0.67"
-#define IP_MB "10.0.0.105"
+#define IP_DHT "10.0.0.81"
+#define IP_ADC  "10.0.0.105"
 #endif
 #ifdef _CELL
-#define IP    "192.168.1.4"
-#define IP_MB "192.168.1.3"
+#define IP_DHT "192.168.1.4"
+#define IP_ADC  "192.168.1.3"
 #endif
 
 int connect2server(char *ip, char * port,int * sockfd); // connect to rapberry
@@ -59,12 +64,20 @@ int connect2server(char *ip, char * port,int * sockfd)
 
 int read_esp8266(char *msg,char * result)
 {
-    char buffer[256];
+    char buffer[256],file[80];;
     int sockfd,n;
+	string line;
     if (strstr(msg,"DHT"))
-     connect2server(IP,PORT,&sockfd);
-    else if (strstr(msg,"MB"))
-     connect2server(IP_MB,PORT,&sockfd);
+		strcpy(file,"/home/pi/blynk-library/linux/ip_dht.txt");
+    else if (strstr(msg,"ADC") || strstr(msg,"CLR"))
+		strcpy(file,"/home/pi/blynk-library/linux/ip_adc.txt");
+
+	ifstream myFile (file);
+	if (myFile.is_open()) {
+		getline (myFile,line);
+	}
+
+    connect2server((char *)line.c_str(),PORT,&sockfd);
 
     bzero(buffer,strlen(buffer));
     strcpy(buffer,msg);
