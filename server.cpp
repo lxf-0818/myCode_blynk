@@ -14,7 +14,8 @@
 #include <ostream>
 #include <iostream>
 #include <fstream>
-
+char *connected_ip;
+bool ng ;
 using namespace std;
 void connection_info(struct sockaddr_in &client);
 void error(const char *msg)
@@ -25,7 +26,7 @@ void error(const char *msg)
 
 void connection_info(struct sockaddr_in &client){
     	
-    char *connected_ip= inet_ntoa(client.sin_addr);
+    connected_ip= inet_ntoa(client.sin_addr);
     printf("Connected From %s \n",connected_ip);
 
 }
@@ -68,13 +69,22 @@ int main(int argc, char *argv[])
      	n = read(newsockfd,buffer,255);
 
      	if (n < 0) error("ERROR reading from socket");
+		ng = false;
 		ofstream myfile;
-		if (strstr(buffer,"DHT"))
-    		myfile.open ("/home/pi//blynk-library/linux/ip_dht.txt");
-		else
+		if (strstr(buffer,"MCP"))
+    		myfile.open ("/home/pi//blynk-library/linux/ip_mcp.txt");
+		else if (strstr(buffer,"ADC"))
     		myfile.open ("/home/pi//blynk-library/linux/ip_adc.txt");
-		myfile << buffer+4;
-		myfile.close();
+		else if (strstr(buffer,"DS0"))
+    		myfile.open ("/home/pi//blynk-library/linux/ip_ds0.txt");
+		else {
+			printf("%s %s\n",buffer,connected_ip);
+			ng = true;
+		}
+		if (!ng) {
+			myfile << buffer+4;
+			myfile.close();
+		}
 			
 
      	n = write(newsockfd,"I got your message",18);

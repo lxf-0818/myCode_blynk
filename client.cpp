@@ -67,10 +67,12 @@ int read_esp8266(char *msg,char * result)
     char buffer[256],file[80];;
     int sockfd,n;
 	string line;
-    if (strstr(msg,"DHT"))
-		strcpy(file,"/home/pi/blynk-library/linux/ip_dht.txt");
+    if (strstr(msg,"MCP"))
+		strcpy(file,"/home/pi/blynk-library/linux/ip_mcp.txt");
     else if (strstr(msg,"ADC") || strstr(msg,"CLR"))
 		strcpy(file,"/home/pi/blynk-library/linux/ip_adc.txt");
+	else if (strstr(msg,"DS0"))
+		strcpy(file,"/home/pi/blynk-library/linux/ip_ds0.txt");
 
 	ifstream myFile (file);
 	if (myFile.is_open()) {
