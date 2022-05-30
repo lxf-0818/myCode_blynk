@@ -16,6 +16,7 @@
 #include <fstream>
 char *connected_ip;
 bool ng ;
+char low[4] = {'\0'};
 using namespace std;
 void connection_info(struct sockaddr_in &client);
 void error(const char *msg)
@@ -35,7 +36,7 @@ int main(int argc, char *argv[])
 	
     int sockfd, newsockfd, portno,n;
     socklen_t clilen;
-    char buffer[256];
+    char buffer[256],pathFile[40];
     struct sockaddr_in serv_addr, cli_addr;
   
     if (argc < 2) {
@@ -71,20 +72,15 @@ int main(int argc, char *argv[])
      	if (n < 0) error("ERROR reading from socket");
 		ng = false;
 		ofstream myfile;
-		if (strstr(buffer,"MCP"))
-    		myfile.open ("/home/pi//blynk-library/linux/ip_mcp.txt");
-		else if (strstr(buffer,"ADC"))
-    		myfile.open ("/home/pi//blynk-library/linux/ip_adc.txt");
-		else if (strstr(buffer,"DS0"))
-    		myfile.open ("/home/pi//blynk-library/linux/ip_ds0.txt");
-		else {
-			printf("%s %s\n",buffer,connected_ip);
-			ng = true;
+		printf("%s\n",buffer);
+		for(int i =0;i<3;i++){
+		  low[i] = tolower(buffer[i]);
 		}
-		if (!ng) {
-			myfile << buffer+4;
-			myfile.close();
-		}
+		printf("%s\n",low);
+		sprintf(pathFile,"/home/pi//blynk-library/linux/ip_%s.txt",low);
+		myfile.open (pathFile);
+		myfile << buffer+4;
+		myfile.close();
 			
 
      	n = write(newsockfd,"I got your message",18);

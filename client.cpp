@@ -12,16 +12,6 @@
 using namespace std;
 
 #define PORT "8888"
-#define _HOME
-//#define _CELL
-#ifdef _HOME
-#define IP_DHT "10.0.0.81"
-#define IP_ADC  "10.0.0.105"
-#endif
-#ifdef _CELL
-#define IP_DHT "192.168.1.4"
-#define IP_ADC  "192.168.1.3"
-#endif
 
 int connect2server(char *ip, char * port,int * sockfd); // connect to rapberry
 void error(const char *msg);
@@ -73,6 +63,8 @@ int read_esp8266(char *msg,char * result)
 		strcpy(file,"/home/pi/blynk-library/linux/ip_adc.txt");
 	else if (strstr(msg,"DS0"))
 		strcpy(file,"/home/pi/blynk-library/linux/ip_ds0.txt");
+	else if (strstr(msg,"BME"))
+		strcpy(file,"/home/pi/blynk-library/linux/ip_bme.txt");
 
 	ifstream myFile (file);
 	if (myFile.is_open()) {
