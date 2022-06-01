@@ -72,14 +72,16 @@ int main(int argc, char *argv[])
      	if (n < 0) error("ERROR reading from socket");
 		ng = false;
 		ofstream myfile;
-		printf("%s\n",buffer);
+		char ipAddr[20];
+		strcpy(ipAddr,buffer+4);
 		for(int i =0;i<3;i++){
 		  low[i] = tolower(buffer[i]);
 		}
 		printf("%s\n",low);
+		//sprintf(pathFile,"/home/pi//blynk-library/linux/ip_%s_%s.txt",low,ipAddr);
 		sprintf(pathFile,"/home/pi//blynk-library/linux/ip_%s.txt",low);
 		myfile.open (pathFile);
-		myfile << buffer+4;
+		myfile << ipAddr;
 		myfile.close();
 			
 
