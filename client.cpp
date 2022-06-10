@@ -19,7 +19,7 @@ void error(const char *msg);
 void error(const char *msg)
 {
     perror(msg);
-    exit(0);
+    //exit(0);
 }
 int connect2server(char *ip, char * port,int * sockfd)
 {
@@ -36,7 +36,8 @@ int connect2server(char *ip, char * port,int * sockfd)
     server = gethostbyname(ip);
     if (server == NULL) {
         fprintf(stderr,"ERROR, no such host\n");
-        exit(0);
+		return 1;
+//        exit(0);
     }
     bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
@@ -45,8 +46,11 @@ int connect2server(char *ip, char * port,int * sockfd)
          server->h_length);
 
     serv_addr.sin_port = htons(portno);
-    if (connect(*sockfd,(const sockaddr*)&serv_addr,sizeof(serv_addr)) < 0)
-       error("ERROR connecting");
+    if (connect(*sockfd,(const sockaddr*)&serv_addr,sizeof(serv_addr)) < 0) {
+       	//error("ERROR connecting");
+		printf("connection failed\n");
+		return 0;
+	}
 
     printf("connect to server success %s\n",ip);
     return 0;
